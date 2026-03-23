@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Scribd PDF Downloader</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      width: 340px;
+      background: #0f1117;
+      color: #e0e0e0;
+      padding: 20px;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .logo {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, #e84949, #ff6b35);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: 900; color: white;
+    }
+
+    .title { font-size: 16px; font-weight: 700; color: #fff; }
+    .subtitle { font-size: 11px; color: #888; margin-top: 2px; }
+
+    .input-group { margin-bottom: 14px; }
+    .input-group label {
+      display: block; font-size: 12px;
+      color: #aaa; margin-bottom: 6px;
+      font-weight: 500;
+    }
+
+    .input-group input {
+      width: 100%; padding: 9px 12px;
+      background: #1a1d27;
+      border: 1px solid #2e3040;
+      border-radius: 8px;
+      color: #e0e0e0;
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .input-group input:focus { border-color: #e84949; }
+    .input-group input::placeholder { color: #555; }
+
+    .btn {
+      width: 100%; padding: 11px;
+      border: none; border-radius: 8px;
+      font-size: 14px; font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 8px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #e84949, #ff6b35);
+      color: white;
+    }
+    .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-primary:disabled {
+      opacity: 0.5; cursor: not-allowed; transform: none;
+    }
+
+    .btn-secondary {
+      background: #1a1d27;
+      border: 1px solid #2e3040;
+      color: #ccc;
+      font-size: 13px;
+    }
+    .btn-secondary:hover { background: #22263a; }
+
+    .status {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      line-height: 1.5;
+      display: none;
+    }
+
+    .status.info  { background: #1a2a3a; border: 1px solid #2a4a6a; color: #7ab8f5; }
+    .status.success { background: #1a2e1a; border: 1px solid #2a5a2a; color: #7acc7a; }
+    .status.error   { background: #2e1a1a; border: 1px solid #5a2a2a; color: #f57a7a; }
+
+    .steps {
+      margin-top: 14px;
+      padding: 12px;
+      background: #1a1d27;
+      border-radius: 8px;
+      border: 1px solid #2e3040;
+    }
+
+    .steps-title {
+      font-size: 11px; color: #888;
+      margin-bottom: 8px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+
+    .step {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 12px; color: #aaa; margin-bottom: 6px;
+    }
+    .step:last-child { margin-bottom: 0; }
+    .step-num {
+      width: 20px; height: 20px;
+      background: #2e3040;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 700; flex-shrink: 0;
+      color: #888;
+    }
+    .step.active .step-num { background: #e84949; color: white; }
+    .step.done .step-num   { background: #2a5a2a; color: #7acc7a; }
+    .step.active { color: #e0e0e0; }
+    .step.done   { color: #7acc7a; }
+
+    .progress-bar {
+      height: 3px; background: #2e3040;
+      border-radius: 2px; margin-top: 12px; overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #e84949, #ff6b35);
+      border-radius: 2px;
+      width: 0%; transition: width 0.4s ease;
+    }
+
+    .divider { height: 1px; background: #2e3040; margin: 14px 0; }
+    .hint { font-size: 11px; color: #666; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">S</div>
+    <div>
+      <div class="title">Scribd Downloader</div>
+      <div class="subtitle">Tải PDF từ Scribd miễn phí</div>
+    </div>
+  </div>
+
+  <div class="input-group">
+    <label>Link Scribd</label>
+    <input type="text" id="scribdUrl"
+      placeholder="https://www.scribd.com/document/..." />
+  </div>
+
+  <button class="btn btn-primary" id="startBtn">
+    🚀 Bắt đầu tải
+  </button>
+  <button class="btn btn-secondary" id="openTabBtn">
+    🔗 Mở tab embed
+  </button>
+
+  <div class="status" id="statusBox"></div>
+
+  <div class="steps" id="stepsBox" style="display:none">
+    <div class="steps-title">Tiến trình</div>
+    <div class="step" id="step1">
+      <div class="step-num">1</div>
+      <span>Mở trang Scribd embed</span>
+    </div>
+    <div class="step" id="step2">
+      <div class="step-num">2</div>
+      <span>Scroll qua tất cả trang</span>
+    </div>
+    <div class="step" id="step3">
+      <div class="step-num">3</div>
+      <span>Xóa thanh toolbar</span>
+    </div>
+    <div class="step" id="step4">
+      <div class="step-num">4</div>
+      <span>Mở hộp thoại in PDF</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+  <div class="hint">Sau khi in: chọn "Save as PDF" trong hộp thoại in</div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
