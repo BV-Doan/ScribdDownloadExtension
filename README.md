@@ -1,4 +1,4 @@
-# Scribd Downloader Full Explanation With Code
+# Scribd Downloader Extension Full Explanation With Code
 
 ## Idea
 ### Main Idea:
